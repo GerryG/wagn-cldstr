@@ -1,13 +1,20 @@
 {
   "type"          : "app",
-  "bizmodels"     : [ { "model" : "free" } ],
+  "bizmodels"     : [ 
+    {
+      "model"      : "subscription",
+      "fee"        : "4.99 USD",
+      "period"     : "1 month",
+      "evalperiod" : "1 month"
+    }
+  ],
   "architectures" : [ "arch_nwsa_1dbm" ],
 
   "info" : {
     "name"            : "Wagn",
     "tagline"         : "how pioneers roll",
     "developer"       : "wagn.org",
-    "upstreamversion" : "1.8.pub",
+    "upstreamversion" : "1.9.0",
     "cldstrversion"   : "0.%{now.identifier}",
     "licenses"        : [ "gplv2" ]
   },
@@ -15,27 +22,37 @@
   "package"       : { 
     "maintainer"      : "wagn.org", 
     "packagebasename" : "wagn",
-    "distros"         : [ "yellow" ]
+    "distros"         : [ "red","yellow","green" ]
   }, 
 
   "roles" : {
     "ws" : {
+      "defaultcontext" : "/wagn",
       "depends" : [
-        "ruby",
-        "rubygems",
+        "cldstr+cldstr.com+passenger+ss",
         "cldstr+cldstr.com+rubygems+ss",
+        "cldstr+cldstr.com+postfix+ss",
+        "cldstr+cldstr.com+memcached+ws",
         "libmysql-ruby",
         "libmysqlclient-dev",
-        "libapache2-mod-passenger",
-        "libapache2-mod-xsendfile",
         "imagemagick",
-        "libmagick9-dev",
-        "cldstr+cldstr.com+postfix+ss",
-        "cldstr+cldstr.com+memcached+ws"
+        "libmagickwand-dev",
+        "libapache2-mod-passenger",
+        "libapache2-mod-xsendfile"
       ],
+      "robotstxt" : {
+        "disallow" : [
+          "/card/",
+          "/admin/",
+          "/account/",
+          "/*?*"
+        ]
+      },
       "apache2modules" : [
+        "passenger",
         "expires",
-        "xsendfile"
+        "xsendfile",
+        "headers"
       ],
       "files" : [
         {
@@ -45,9 +62,16 @@
           "paths" : [ 
             "/var/log/cldstr+wagn.org+wagn+ws",
             "web/config.ru",
-            "web/tmp"
+            "web/Gemfile.lock",
+            "web/tmp",
+            "web/script/rails",
+            "bin/migrate.rb"
           ]
-        } 
+        },
+        {
+          "mode"  : "0666",
+          "paths" : [  "web/tmp/restart.txt" ]
+        }        
       ],
       "appconfigitems" : [
         {
@@ -75,6 +99,13 @@
         },
         {
           "type"         : "file",
+          "uname"        : "www-data",
+          "gname"        : "www-data",
+          "mode"         : "0666",
+          "name"         : "/var/log/cldstr+wagn.org+wagn+ws/${appconfig.appconfigid}.log"
+        },
+        {
+          "type"         : "file",
           "name"         : "/var/cldstr/wagn.org/wagn/ws/${appconfig.appconfigid}/database.yml",
           "template"     : "tmpl/database.yml.tmpl",
           "templatelang" : "varsubst"
@@ -87,25 +118,21 @@
         },
         {
           "type"         : "symlink",
-          "target"       : "/usr/cldstr/wagn.org/wagn/ws/web",
-          "name"         : "/var/cldstr/wagn.org/wagn/ws/${appconfig.appconfigid}/web"
-        },
-        {
-          "type"         : "symlink",
           "target"       : "/usr/cldstr/wagn.org/wagn/ws/web/public/$4",
           "names"        : [
             "assets",
+            "assets2bpacked",
             "files",
             "404.html",
             "500.html",
-            "robots.txt"
+            "favicon.ico"
           ]
-        },
-        {
-          "type"         : "file",
-          "name"         : "/usr/cldstr/wagn.org/wagn/ws/web/tmp/restart.txt"
         }
-      ]
+      ],
+      "postappconfiginst" : {
+        "type" : "perlscript",
+        "name" : "bin/migrate.pl"
+      }
     },
     "ctrl" : {
       "appconfigitems" : [

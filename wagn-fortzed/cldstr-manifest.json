@@ -8,14 +8,14 @@
     "tagline"         : "fz fonts",
     "developer"       : "wagn.org",
     "licenses"        : ["gplv2"],
-    "upstreamversion" : "0.1",
+    "upstreamversion" : "1.9.0",
     "cldstrversion"   : "0.%{now.identifier}",
   },
 
   "package" : { 
     "maintainer"      : "wagn.org",
     "packagebasename" : "wagn-fortzed",
-    "distros"         : [ "yellow" ]
+    "distros"         : [ "red","yellow","green" ]
   }, 
 
   "roles" : {
