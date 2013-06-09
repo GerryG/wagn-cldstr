@@ -1,7 +1,6 @@
 # -*- encoding : utf-8 -*-
 module Wagn::Set::FortZed
-  
-  include Wagn::Sets
+  extend Wagn::Set
   
   format :html
   
